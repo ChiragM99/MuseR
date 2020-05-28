@@ -1,10 +1,10 @@
-#MuseR
+# MuseR
 
-#Machine Learning Music Recommendation App
+# Machine Learning Music Recommendation App
 
 To run the app:
 
-#Installation on Windows PowerShell
+# Installation on Windows PowerShell
 
 1. Install python3 on your computer
 
@@ -31,13 +31,15 @@ To run the app:
 12. Run localhost server: python manage.py runserver
 
 
-#API Key
+# API Key
 
 A client secret and ID is required from the Spotify for Developers website. This is obtained by creating a Spotify account 
 and navigating to the Spotify for Developers page. From there this, the Django app must be registered and a client ID and Secret
-will be given. These must be entered into the respetive views.py variables called CLIENT_ID and CLIENT_SECRET, for the API to function.
+will be given. These must be entered into the respetive settings.py variables (line  called CLIENT_ID and CLIENT_SECRET, for the API to function.
+These client credentials are sensitive information and are therefore not shared.
 
-This can be obtained here: https://developer.spotify.com/documentation/general/guides/app-settings/
+Spotify credentials can be obtained here: https://developer.spotify.com/documentation/general/guides/app-settings/
+settings.py is located at: MuseR/settings.py
 
 # Admin
 
