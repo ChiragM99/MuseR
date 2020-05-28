@@ -1,0 +1,32 @@
+{% extends "mainapp/base.html" %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+      <div class="media">
+        <img class="rounded-circle account-img" src="{% media 'default.png' %}">
+        <div class="media-body">
+          <h2 class="account-heading">{{  user.username }}</h2>
+          <p class="text-secondary">{{ user.email }}</p>
+        </div>
+      </div>
+      <!-- FORM HERE -->
+      <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <!--Fieldset to group related elements in form -->
+          <fieldset class="form-group">
+            <!-- Gives form more detail-->
+              <legend class="border-bottom mb-4">Profile Details</legend>
+              <!--render form-->
+              {{ a_form|crispy }}
+              {{ f_form|crispy }}
+          </fieldset>
+          <div class="form-group">
+              <button class="btn btn-outline-info" type="submit">Update</button>
+          </div>
+      </form>
+
+      <div class="form-group">
+      </div>
+    </div>
+{% endblock content %}

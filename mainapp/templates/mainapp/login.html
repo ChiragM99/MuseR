@@ -1,0 +1,36 @@
+{% extends "mainapp/base.html" %}
+<!-- {% load crispy_forms_tags %} -->
+{% load static %}
+{% block content %}
+<style type="text/css">
+	body{
+		background: url({% static 'images/6.jpg' %}) no-repeat center;
+		margin: 0; height: 100%; overflow: hidden;
+	}
+</style>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/form.css' %}"/>
+	<div class = "container">
+		<div class="d-flex justify-content-center">
+			<form method="post" name="Login_Form" class="form">
+				{% csrf_token %}
+				<h2>Login</h2>
+				{% if message %}
+					<div class="alert alert-danger" role="alert">
+						{{message}}
+					</div>
+				{% endif %}
+				<input type="text" name="login" hidden></input>
+				<div class="input-group">
+					<input type="text" name="email" id="email" required>
+					<label for="email">Email</label>
+				</div>
+				<div class="input-group">
+					<input type="password" name="password" id="password" required>
+					<label for="password">Password</label>
+				</div>
+				<input type="submit" value="Login" class="submit-btn">
+				<a href="{% url 'mainapp:password_request' %}" class="forgot-pw">Forgot Password?</a>
+			</form>
+		</div>
+	</div><br><br>
+{% endblock content %}

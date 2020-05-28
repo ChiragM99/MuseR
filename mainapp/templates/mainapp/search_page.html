@@ -1,0 +1,87 @@
+{% extends "mainapp/base.html" %}
+{% load static %}
+{% block content %}
+	<div class="container">
+		<form class="form-horizontal" role="form" method="post">
+			{% csrf_token %}
+			<div class="input-group mb-3">
+				<input type="text" class="form-control" name="musicsearch" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
+				<div class="input-group-append">
+					<button class="btn btn-outline-secondary" type="submit">Search</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="container" style="margin-bottom: 50px;">
+		{% if track_results %}
+			<table class="table">
+				<thead class="thead-dark">
+					<tr>
+					</tr>
+				</thead>
+				{% for tracks in track_results %}
+					<tbody>
+						<tr id="track.{{tracks.id}}">
+							<th><a href="{% url 'mainapp:track_page' id=tracks.id %}">{{tracks.track_name}}</a></th>
+							{% if user.is_authenticated %}
+								<th>by {{tracks.artist_name}}</th>
+							{% else %}
+								<th>by {{tracks.artist.artist_name}}</th>
+							{% endif %}
+							
+							{% if user.is_authenticated %}
+								{% if tracks.in_favourites %}
+									<th><button type="button" class="btn btn-danger" onclick="remove_from_favourites('{{tracks.id}}');">Remove from my Library</button></th>
+								{% else %}
+									<th><button type="button" class="btn btn-success" onclick="add_to_favourites('{{tracks.id}}');">Add to My Library</button></th>
+								{% endif %}
+								
+							{% endif %}
+						</tr>
+					</tbody>
+				{% endfor %}
+			</table>
+		{% endif %}
+	</div><br><br>
+<script type="text/javascript">
+	function remove_from_favourites(track_id){
+		track_id = track_id.toString();
+		$.ajax({
+            type: "PUT",
+            data: {
+                objective: 'remove_from_favourites',
+                track_id: track_id,
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+            	console.log(response);
+            	if(response.status_code==204 && response.status=="success"){
+            		var row = document.getElementById("track."+track_id).cells[2];
+            		row.innerHTML = '<button type="button" class="btn btn-success" onclick="add_to_favourites('+track_id+');">Add to My Library</button>';
+            		console.log("done removed");
+            	}
+            }
+        })
+	}
+
+	function add_to_favourites(track_id){
+		track_id = track_id.toString();
+		$.ajax({
+            type: "PUT",
+            data: {
+                objective: 'add_to_favourites',
+                track_id: track_id,
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+            	console.log(response);
+            	if(response.status_code==204 && response.status=="success"){
+            		track_id = parseInt(track_id);
+            		var row = document.getElementById("track."+track_id).cells[2];
+            		row.innerHTML = '<button type="button" class="btn btn-danger" onclick="remove_from_favourites('+track_id+');">Remove from my Library</button>';
+            	}
+            }
+        })
+	}
+</script>
+{% endblock content %}

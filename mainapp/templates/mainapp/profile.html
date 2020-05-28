@@ -1,0 +1,106 @@
+{% extends "mainapp/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+  <style type="text/css">
+  body{
+  background: url({% static 'images/6.jpg' %}) no-repeat center;
+  }
+  </style>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/form.css' %}"/>
+  <div class = "container">
+    <!-- <div class="content-section">
+      <div class="media">
+        <img class="rounded-circle account-img" src="{{ profile.profilepic.url }}">
+      </div>
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset class="form-group">
+          <legend class="border-bottom mb-4">Profile Details</legend>
+          {{ f_form|crispy }}
+        </fieldset>
+        <div class="form-group">
+          <button class="btn btn-outline-info" type="submit">Update</button>
+        </div>
+      </form>
+    </div> -->
+    <div class="d-flex justify-content-center">
+      <form method="post" name="Login_Form" class="form" style="max-width: 600px;">
+        {% csrf_token %}
+        <h2>Profile</h2>
+        {% if message %}
+          <div class="alert alert-danger" role="alert">
+            {{message}}
+          </div>
+        {% endif %}
+        <input type="text" name="login" hidden></input>
+        <div class="input-group">
+          <div class="col form-group">
+            <input type="text" name="first_name" class="form-control" placeholder="" value="{{ user.first_name }}">
+          </div>
+          <div class="col form-group">
+            <input type="text" name="last_name" class="form-control" placeholder="" value="{{ user.last_name }}">
+          </div>
+        </div>
+        <div class="input-group">
+          <input type="email" name="email" class="form-control" placeholder="" value="{{ user.email }}" disabled>
+        </div>
+        <div class="input-group">
+          <div class="form-group col-md-6">
+            <label>Speechiness</label><br><br>
+            <select name="speechiness" id="speechiness" class="form-control">
+              <option id="speechiness-1" value="1.0">Vocal-Heavy</option>
+              <option id="speechiness-2" value="0.5">Balanced</option>
+              <option id="speechiness-3" value="0.0">Instrumental-Heavy</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Tempo</label><br><br>
+            <select id="tempo" name="tempo" class="form-control">
+              <option id="tempo-1" value="1.0">Fast</option>
+              <option id="tempo-2" value="0.5">Medium</option>
+              <option id="tempo-3" value="0.0">Slow</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Energy</label><br><br>
+            <select name="energy" id="energy" class="form-control">
+              <option id="energy-1" value="1.0">High</option>
+              <option id="energy-2" value="0.5">Medium</option>
+              <option id="energy-3" value="0.0">Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="col form-group">
+            <input class="form-control" name="password" type="password" placeholder="Update password (Leave blank if necessary)">
+          </div>
+        </div>
+        <input type="submit" value="Update Profile" class="submit-btn">
+      </form>
+    </div>
+  </div><br><br>
+  <script type="text/javascript">
+  if("{{profile.tempo}}"==1.0){
+  $("#tempo-1").attr("selected","selected");
+  } else if("{{profile.tempo}}"==0.5){
+  $("#tempo-2").attr("selected","selected");
+  } else {
+  $("#tempo-3").attr("selected","selected");
+  }
+  if("{{profile.speechiness}}"==1.0){
+  $("#speechiness-1").attr("selected","selected");
+  } else if("{{profile.speechiness}}"==0.5){
+  $("#speechiness-2").attr("selected","selected");
+  } else {
+  $("#speechiness-3").attr("selected","selected");
+  }
+  if("{{profile.energy}}"==1.0){
+  $("#energy-1").attr("selected","selected");
+  } else if("{{profile.energy}}"==0.5){
+  $("#energy-2").attr("selected","selected");
+  } else {
+  $("#energy-3").attr("selected","selected");
+  }
+  </script>
+{% endblock content %}

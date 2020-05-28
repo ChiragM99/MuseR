@@ -1,0 +1,193 @@
+{% extends "mainapp/base.html" %}
+{% load static %}
+{% block content %}
+	<style type="text/css">
+		.checked {
+  color: orange;
+}
+		.reviews-members .media .mr-3 {
+	width: 56px;
+	height: 56px;
+	object-fit: cover;}
+		.user-rating {
+	direction: rtl;
+	font-size: 20px;
+	unicode-bidi: bidi-override;
+	padding: 10px 30px;
+	display: inline-block;
+	}
+	.user-rating input {
+	opacity: 0;
+	position: relative;
+	left: -15px;
+	z-index: 2;
+	cursor: pointer;
+	}
+	.user-rating span.star:before {
+	color: #777777;
+	content:"ï€†";
+	/*padding-right: 5px;*/
+	}
+	.user-rating span.star {
+	display: inline-block;
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: normal;
+	position: relative;
+	z-index: 1;
+	}
+	.user-rating span {
+	margin-left: -15px;
+	}
+	.user-rating span.star:before {
+	color: #777777;
+	content:"\f006";
+	/*padding-right: 5px;*/
+	}
+	.user-rating input:hover + span.star:before, .user-rating input:hover + span.star ~ span.star:before, .user-rating input:checked + span.star:before, .user-rating input:checked + span.star ~ span.star:before {
+	color: #ffd100;
+	content:"\f005";
+	}
+	.selected-rating{
+	color: #ffd100;
+	font-weight: bold;
+	font-size: 3em;
+	}.selected-rating-2{
+	color: #ffd100;
+	font-weight: bold;
+	font-size: 3em;
+	}
+	</style>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/track.css' %}"/>
+	<div class="container">
+		<div class="row">
+			<div class="col-5">
+				<div class="card text-white bg-dark">
+					<img class="card-img-top" src="{{track.track_image}}" alt="Card image cap" style="width: 100%;object-fit: contain;"/>
+					<div class="card-body pt-5">
+						<h5 class="card-title">{{track.track_name}}</h5>
+						<p class="card-text">{{track.artist.artist_name}}</p>
+						<p class="card-text" id="average_rating"></p>
+					</div>
+				</div>
+			</div>
+			<div class="col-7">
+				<form method="post">
+					{% csrf_token %}
+					{% if user.is_authenticated %}
+						{% if in_favourites %}
+							<button type="Submit" class="btn btn-danger" name="remove_from_favourites" >Remove from my Library</button>
+						{% else %}
+							<button type="Submit" class="btn btn-secondary" name="add_to_favourites" >Add to my Library</button>
+						{% endif %}
+					{% endif %}
+				</form>
+				<div class="bg-white rounded shadow-sm p-4 mb-5 rating-review-select-page">
+					<h5 class="mb-4">Leave Review</h5>
+					<p class="mb-2">Rate the Track</p>
+					<form id="user-rating-form">
+						<span class="user-rating">
+							<input type="radio" name="rating" value="5"><span class="star"></span>
+							<input type="radio" name="rating" value="4"><span class="star"></span>
+							<input type="radio" name="rating" value="3"><span class="star"></span>
+							<input type="radio" name="rating" value="2"><span class="star"></span>
+							<input type="radio" name="rating" value="1"><span class="star"></span>
+						</span>
+					</form>
+					
+					<form method="post">
+						{% csrf_token %}
+						<div class="form-group">
+							<label>Your Comment</label>
+							<textarea class="form-control" name="description"></textarea>
+						</div>
+						<div class="form-group">
+							{% if user.is_authenticated %}
+								<button class="btn btn-primary btn-sm" type="submit"> Submit Comment </button>
+							{% else %}
+								<button class="btn btn-primary btn-sm" type="submit" disabled> Submit Comment </button>
+							{% endif %}
+						</div>
+						<input type="text" name="selected-rating" id="selected-rating" class="selected-rating" value="0" hidden>
+					</form>
+				</div>
+				<div class="bg-white rounded shadow-sm p-4 mb-4 restaurant-detailed-ratings-and-reviews" style="height:400px;overflow:auto;">
+					<h5 class="mb-1">All Ratings and Reviews</h5>
+					{% if rating %}
+						{% for comments in rating %}
+							<div class="reviews-members pt-4 pb-4">
+								<div class="media">
+									<a href="#"><img alt="Generic placeholder image" src="https://www.clipartkey.com/mpngs/m/29-297748_round-profile-image-placeholder.png" class="mr-3 rounded-pill"></a>
+									<div class="media-body">
+										<div class="reviews-members-header">
+											<span class="star-rating float-right">
+												<a href="#"><i class="icofont-ui-rating active"></i></a>
+												<a href="#"><i class="icofont-ui-rating active"></i></a>
+												<a href="#"><i class="icofont-ui-rating active"></i></a>
+												<a href="#"><i class="icofont-ui-rating active"></i></a>
+												<a href="#"><i class="icofont-ui-rating"></i></a>
+											</span>
+											<h6 class="mb-1"><a class="text-black" href="#">{{comments.user.first_name}}</a></h6>
+											<p class="text-gray">{{comments.created_at}}</p>
+										</div>
+										<div class="reviews-members-body">
+											<p>{{comments.description}}</p>
+										</div>
+										<div class="reviews-members-footer">
+											<p id="comment.id/{{comments.id}}">{{comments.rating_value}}</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr>
+						{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		$('#user-rating-form').on('change','[name="rating"]',function(){
+			$('#selected-rating').text($('[name="rating"]:checked').val());
+			$('input[name=selected-rating]').val($('[name="rating"]:checked').val());
+		});
+
+		{% if rating %}
+		{% for comments in rating %}
+		var stars = "";
+		if("{{comments.rating_value}}"==0){
+			stars = '<span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span>';
+		}else if("{{comments.rating_value}}"==1){
+			stars = '<span class="fa fa-star checked"></span><span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span>';
+		}else if("{{comments.rating_value}}"==2){
+			stars = '<span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span>';
+		}else if("{{comments.rating_value}}"==3){
+			stars = '<span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star"></span><span class="fa fa-star"></span>';
+		}else if("{{comments.rating_value}}"==4){
+			stars = '<span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star"></span>';
+		}else if("{{comments.rating_value}}"==5){
+			stars = '<span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span>';
+		}
+		document.getElementById("comment.id/{{comments.id}}").innerHTML = stars;
+		{% endfor %}
+		{% endif %}
+
+
+
+		var stars = "";
+		if("{{average_rating}}"==0){
+			stars = '<span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span>';
+		}else if("{{average_rating}}"==1){
+			stars = '<span class="fa fa-star checked"></span><span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span>';
+		}else if("{{average_rating}}"==2){
+			stars = '<span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star"></span><span class="fa fa-star"></span><span class="fa fa-star"></span>';
+		}else if("{{average_rating}}"==3){
+			stars = '<span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star"></span><span class="fa fa-star"></span>';
+		}else if("{{average_rating}}"==4){
+			stars = '<span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star"></span>';
+		}else if("{{average_rating}}"==5){
+			stars = '<span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span><span class="fa fa-star checked"></span>';
+		}
+		document.getElementById("average_rating").innerHTML = stars+" ({{rating_count}})";
+	</script>
+{% endblock content %}

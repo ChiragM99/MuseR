@@ -1,0 +1,118 @@
+{% extends "mainapp/base.html" %}
+{% load static %}
+{% block content %}
+<section id="tabs">
+	<div class="container">
+		<h2>My Library</h2>
+		<div class="row">
+			<div class="col-xs-12 ">
+				<nav>
+					<div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+						<a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">My Favourites</a>
+						<a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">My Recommendations</a>
+					</div>
+				</nav>
+				<div class="tab-content py-3 px-3 px-sm-0" id="nav-tabContent">
+					<div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" style="height:500px;overflow:auto;">
+						{% if my_favourites %}
+							<table class="table" id="favourites-table" style="table-layout:fixed;">
+								<thead class="thead-dark">
+									<tr>
+										<th scope="col">Title</th>
+										<th scope="col">Artist</th>
+										<th scope="col">Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for tracks in my_favourites %}
+										<tr id="my_favourites.{{tracks.id}}">
+											<th><a href="{% url 'mainapp:track_page' id=tracks.id %}">{{tracks.track_name}}</a></th>
+											<td>{{tracks.artist.artist_name}}</td>
+											<td>
+												<button type="submit" class="btn btn-danger" id="remove_from_favourites" onclick="remove_from_favourites('{{tracks.id}}');">Remove from my Favourites</button>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						{% else %}
+							<table class="table" id="favourites-table" style="table-layout:fixed;">
+								<thead class="thead-dark">
+									<tr>
+										<th scope="col">Title</th>
+										<th scope="col">Artist</th>
+										<th scope="col">Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><p>None found</p></td>
+									</tr>
+								</tbody>
+							</table><br><br><br><br><br><br><br><br><br><br>
+						{% endif %}
+					</div>
+					<div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab" style="height:500px;overflow:auto;">
+						{% if my_recommendation %}
+							<table class="table" id="recommendation-table" style="table-layout:fixed;">
+								<thead class="thead-dark">
+									<tr>
+										<th scope="col">Title</th>
+										<th scope="col">Artist</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for tracks in my_recommendation %}
+										<tr id="{{tracks.id}}">
+											<th><a href="{% url 'mainapp:track_page' id=tracks.id %}">{{tracks.track_name}}</a></th>
+											<td>{{tracks.artist.artist_name}}</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						{% else %}
+							<table class="table" id="recommendation-table" style="table-layout:fixed;">
+								<thead class="thead-dark">
+									<tr>
+										<th scope="col">Title</th>
+										<th scope="col">Artist</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><p>None found</p></td>
+									</tr>
+								</tbody>
+							</table>
+							<br><br><br><br><br><br><br><br><br><br>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section><br><br>
+<script type="text/javascript">
+	function remove_from_favourites(track_id){
+		$.ajax({
+			type: "PUT",
+			data: {
+				objective: 'remove_from_favourites',
+				track_id: track_id,
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success: function(response) {
+				if(response.status_code==204 && response.status=="success"){
+					var row = document.getElementById("my_favourites."+track_id);
+					var table = row.parentNode;
+					while ( table && table.tagName != 'TABLE' )
+					table = table.parentNode;
+					if ( !table )
+						return;
+					table.deleteRow(row.rowIndex);
+				}
+			}
+		})
+	}
+</script>
+{% endblock %}
